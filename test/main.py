@@ -30,3 +30,4 @@ if __name__ == "__main__":
     Assembler.create_binary(pipeline, savepath, savepath)
 
     # finally, activate Kinetic project in Visual Studio
+    # TODO: embed or extend python into c++ project

@@ -31,49 +31,18 @@ def init_cam(fp):
 
 # pipeline configuration for streaming
 def config_pipeline():
-    pipeline = rs.pipeline()
-    config = rs.config()
-    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)     # problem with resolution: camera not supporting 1280*720
-    config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)    # problem with resolution: camera not supporting 1280*720
-    pipe_profile = pipeline.start(config)
-    return pipeline
+	pipeline = rs.pipeline()
+	config = rs.config()
+	config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)     # problem with resolution: camera not supporting 1280*720
+	config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)    # problem with resolution: camera not supporting 1280*720
+	pipe_profile = pipeline.start(config)
+	return pipeline
 
 def set_robot(left_robot_addr, right_robot_addr):
-    left_robot = urx.Robot(left_robot_addr)
-    right_robot = urx.Robot(right_robot_addr)
-    left_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-    right_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-    left_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
-    right_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
-    rob.movej(home_joint_rad, 0.5, 0.5)
-
-# to make hsv_filter, the program requires color image and depth image.
-# this satisfies the requirement.
-def get_cam_img_color_depth(pipeline):
-	frames = pipeline.wait_for_frames()
-	color_frame = frames.get_color_frame()
-	depth_frame = frames.get_depth_frame()
-
-	color_image = np.asanyarray(color_frame.get_data())
-	depth_image = np.asanyarray(depth_frame.get_data())
-
-	return color_image, depth_image
-
-# 
-def get_cam_img_main(pipeline):
-	frames = pipeline.wait_for_frames()
-	color_frame = frames.get_color_frame()
-
-	align = rs.align(rs.stream.color)
-	frameset = align.process(frames)
-
-	aligned_depth_frame = frameset.get_depth_frame()
-
-	# Intrinsics & Extrinsics
-	depth_intrin = aligned_depth_frame.profile.as_video_stream_profile().intrinsics
-	color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
-	# Convert images to numpy arrays
-	depth_image = np.asanyarray(aligned_depth_frame.get_data())
-	color_image = np.asanyarray(color_frame.get_data())
-
-	return aligned_depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
+	left_robot = urx.Robot(left_robot_addr)
+	right_robot = urx.Robot(right_robot_addr)
+	left_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
+	right_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
+	left_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
+	right_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
+	rob.movej(home_joint_rad, 0.5, 0.5)
