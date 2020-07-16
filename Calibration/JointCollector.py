@@ -6,9 +6,13 @@ import numpy as np
 import cv2
 import urx
 import pyrealsense2 as rs
-# from dateutil.parser import private_class
+
 from urx.robotiq_two_finger_gripper import Robotiq_Two_Finger_Gripper
 from Calibration.HSVfilter import read_hsv_filter, get_max_radius
+
+# TODO: implement method
+def save_joint_data():
+	pass
 
 def collect_joint(pipeline, hsv_filter_path, savepath):
 	low_hsv, high_hsv = read_hsv_filter(hsv_filter_path)
@@ -88,14 +92,6 @@ def collect_joint(pipeline, hsv_filter_path, savepath):
 		cv2.imshow('origin', cv2.resize(img, (int(1280 / 2), int(720 / 2))))
 
 		key = cv2.waitKey(33)
-
-		# if key == ord('m'):  # : 로봇 스텝별로 움직이기
-		# 	print(" robot moving on ... ")
-		# 	# k = line.split(' ')
-		# 	# j_pt = [float(j) for j in k]
-		# 	# rob.movej(j_pt, 0.8, 0.8)
-		#
-		# 	cv2.waitKey(100)
 
 		if key == ord('f'):  # : 프리드라이브
 			rob.set_freedrive(not is_free, 3600)  # 3600 sec.

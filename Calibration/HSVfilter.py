@@ -6,6 +6,7 @@ import cv2
 import urx
 import numpy as np
 from Calibration.Helper import nothing, create_directory
+from Calibration.CameraStream import set_robot
 
 def get_max_radius(contours):
     max_radius = 0
@@ -42,7 +43,6 @@ def read_hsv_filter(hsv_filter_path):
     while True:
         text = f_hsv.readline()
         data_line = text.strip('\n')
-        # data_line = text.splitlines()
         if text.__len__() == 0:
             break
         else:
@@ -72,7 +72,8 @@ def save_hsv_filter(pipeline, savepath):
     cv2.namedWindow('bar')
     cv2.resizeWindow('bar', 640, 320)
 
-    # : opencv 함수 트랙바 생성 (트랙바의 이름, 띄울 창, 0~n, 변화시)
+    # opencv 함수 트랙바 생성 (트랙바의 이름, 띄울 창, 0~n, 변화시)
+    # 수작업을 통해서 trackbar에서 가장 appropriate한 hsv를 골라야 한다.
     cv2.createTrackbar('low_h', 'bar', 0, 180, nothing)
     cv2.createTrackbar('low_s', 'bar', 0, 255, nothing)
     cv2.createTrackbar('low_v', 'bar', 0, 255, nothing)
@@ -89,22 +90,7 @@ def save_hsv_filter(pipeline, savepath):
     put_it_on_flag = 0
 
     # : RL robot
-    right_robot = urx.Robot("192.168.0.52")  # 오른쪽
-    left_robot = urx.Robot("192.168.0.51")
-    rob1_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-    rob2_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-
-    right_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
-    left_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
-
-    rob.movej(home_joint_rad, 0.5, 0.5)
-
-    # rob.movel([-0.060355069913524816,
-    #  -0.4409053222811345,
-    #  -0.022449952179487417,
-    #  -2.1925502393945053,
-    #  -2.2480136500524344,
-    #  0.001303274362250708], 0.5, 0.5)
+    set_robot("192.168.0.51", "192.168.0.52")
 
     while True:  # : 프로그램이 돌아가는 영역 - 반복
         frames = pipeline.wait_for_frames()
@@ -124,7 +110,7 @@ def save_hsv_filter(pipeline, savepath):
         # img = cv2.resize(img, (int(1280 / 2), int(720 / 2)))  # : 이미지 변형
         hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)  # : 이미지를 RGB에서 HSV로 변환후 저장
 
-        # get info from track bar and appy to result    # : 트랙바의 현재 상태를 받아 저장 (해당 트랙바 이름, 뜨운 창)
+        # get info from track bar and apply to result    # : 트랙바의 현재 상태를 받아 저장 (해당 트랙바 이름, 뜨운 창)
         low_h = cv2.getTrackbarPos('low_h', 'bar')
         low_s = cv2.getTrackbarPos('low_s', 'bar')
         low_v = cv2.getTrackbarPos('low_v', 'bar')
@@ -150,8 +136,6 @@ def save_hsv_filter(pipeline, savepath):
         #                             2)  # : 가우시안, 어뎁티브 스레스홀드
         _, th3 = cv2.threshold(blurred, 10, 255, cv2.THRESH_BINARY)
 
-        # _, contours, hierarchy = cv2.findContours(th3.copy(), 1, 2)  # :
-        # _, contours, hierarchy = cv2.findContours(th3, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)  # : opencv 3
         contours, hierarchy = cv2.findContours(th3, mode=cv2.RETR_EXTERNAL,
                                                method=cv2.CHAIN_APPROX_SIMPLE)  # : opencv 4
         cv2.drawContours(result, contours, -1, (0, 255, 0), 2)
@@ -199,18 +183,11 @@ def save_hsv_filter(pipeline, savepath):
         th_list = np.argwhere(th3 == 255)
         img_[th_list[:, 0], th_list[:, 1], :] = 255
         result_ = cv2.resize(result, (int(1280 / 2), int(720 / 2)))
-        # th3_ = cv2.resize(th3, (int(1280 / 2), int(720 / 2)))
         img_ = cv2.resize(img_, (int(1280 / 2), int(720 / 2)))
 
         cv2.imshow('result', result_)
-        # cv2.imshow('th3', th3_)
         cv2.imshow('th3', img_)
 
-        # _, contours, hierarchy = cv2.findContours(th3, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)  # :
-        # cv2.drawContours(th3, contours, -1, 127, 2)
-        # cv2.imshow('th3', th3)
-
-        # cv2.imshow('bar', _)
         k = cv2.waitKey(1)
         if k == ord('s'):
             print("-->>sys :  low__Result : H : {}, S : {}, V : {}".format(low_h, low_s, low_v))
@@ -235,18 +212,3 @@ def save_hsv_filter(pipeline, savepath):
         if k & 0xFF == 27:  # ESC
             exit_program(savepath)
             break
-
-        #####################
-        # img_temp01 = cv2.imread(
-        #     'C:/Users/user/Desktop/AI_Project/ball_calib_python/20200508_LG_labeling_00/org/img_20200508-17-42-55.png')
-        # cv2.imshow("test_img01", img_temp01)
-        # cv2.waitKey(2)
-        #
-        # img_temp02 = cv2.imread(
-        #     'C:/Users/user/Desktop/AI_Project/ball_calib_python/20200508_LG_labeling_00/blue_cup/img_20200508-17-44-33.png')
-        # cv2.imshow("test_img02", img_temp02)
-        # cv2.waitKey(2)
-        #
-        # img_temp03 = np.array(img_temp02) - np.array(img_temp01)
-        # cv2.imshow("test_img03", img_temp03)
-        # cv2.waitKey(2)

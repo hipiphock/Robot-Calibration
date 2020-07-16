@@ -1,10 +1,6 @@
 import time
 import copy
-
 import numpy as np
-import cv2
-import pyrealsense2 as rs
-import urx
 
 from context import Calibration
 import Calibration.CameraStream as CameraStream
