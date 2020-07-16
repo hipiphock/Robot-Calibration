@@ -35,7 +35,7 @@ def get_cam_img(pipeline):
 	# return depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
 
 
-def init_cam(fp, l_h, l_s, l_v, h_h, h_s, h_v):
+def init_cam(fp, low_hsv, high_hsv):
 	print("-->>sys : initializing Realsense ......")
 	for num in range(0, fp):
 
@@ -43,8 +43,8 @@ def init_cam(fp, l_h, l_s, l_v, h_h, h_s, h_v):
 		test_view = np.copy(color_image)
 
 		hsv = cv2.cvtColor(test_view, cv2.COLOR_RGB2HSV)
-		lower_blue = np.array([l_h, l_s, l_v])  #
-		upper_blue = np.array([h_h, h_s, h_v])  # FIX
+		lower_blue = low_hsv
+		upper_blue = high_hsv
 		mask = cv2.inRange(hsv, lower_blue, upper_blue)
 		result = cv2.bitwise_and(test_view, color_image, mask=mask)
 

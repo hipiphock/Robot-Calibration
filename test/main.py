@@ -18,6 +18,7 @@ if __name__ == "__main__":
     pipeline = CameraStream.config_pipeline()
 
     # choose save path to save filter, joint, and other stuff
+    # TODO: configure the fie name of hsv_filter, joint, and calculated matrix files
     savepath = "resource/somepath"
 
     # save hsv filter

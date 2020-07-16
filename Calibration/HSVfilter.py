@@ -1,5 +1,9 @@
 import time
+import os
+import copy
+
 import cv2
+import urx
 import numpy as np
 from Calibration.Helper import nothing, create_directory
 
@@ -49,17 +53,19 @@ def read_hsv_filter(hsv_filter_path):
     l_h = int(line[-2][-17:-14])
     l_s = int(line[-2][-10:-7])
     l_v = int(line[-2][-3:])
+    low_hsv = [l_h, l_s, l_v]
 
     h_h = int(line[-1][-17:-14])
     h_s = int(line[-1][-10:-7])
     h_v = int(line[-1][-3:])
-    low_hsv, high_hsv = [], []
+    high_hsv = [h_h, h_s, h_v]
     return low_hsv, high_hsv
 
 # get image and convert color image into numpy array
 def save_hsv_filter(pipeline, savepath):
     """
-    main image handler method for calibration
+    generates and saves hsv filter.
+    the hsv filter will be used later
     """
     cv2.namedWindow('result')
     cv2.namedWindow('th3')
@@ -83,13 +89,13 @@ def save_hsv_filter(pipeline, savepath):
     put_it_on_flag = 0
 
     # : RL robot
-    rob1 = urx.Robot("192.168.0.52")  # 오른쪽
-    rob2 = urx.Robot("192.168.0.51")
+    right_robot = urx.Robot("192.168.0.52")  # 오른쪽
+    left_robot = urx.Robot("192.168.0.51")
     rob1_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
     rob2_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
 
-    rob1.set_tcp([0, 0, 0.153, 0, 0, 0])
-    rob2.set_tcp([0, 0, 0.170, 0, 0, 0])
+    right_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
+    left_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
 
     rob.movej(home_joint_rad, 0.5, 0.5)
 
@@ -175,10 +181,8 @@ def save_hsv_filter(pipeline, savepath):
             if 1 <= put_it_on_flag:
                 if put_it_on_flag == 1:
                     print("-->>hsv : Can't Find the ball")
-
             else:
                 pass
-
             text = "-->>hsv : Can't Find the ball"
             thickness = 1
             color = (0, 0, 255)  # : BGR
