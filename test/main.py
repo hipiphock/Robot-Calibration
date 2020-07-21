@@ -15,16 +15,19 @@ if __name__ == "__main__":
 
     # choose save path to save filter, joint, and other stuff
     # TODO: configure the fie name of hsv_filter, joint, and calculated matrix files
-    savepath = "resource/somepath"
+    save_dir = "resource/somepath"
 
     # save hsv filter
-    HSVfilter.save_hsv_filter(pipeline, savepath)
+    HSVfilter.save_hsv_filter(pipeline, save_dir)
+
+    # TODO: implement additional method for fetching hsv filter path
+    hsv_filter_path = ""
 
     # collect joint
-    JointCollector.collect_joint(pipeline, savepath, savepath)
+    JointCollector.collect_joint(pipeline, hsv_filter_path, save_dir)
 
     # assemble collected joint and hsv filter
-    Assembler.create_binary(pipeline, savepath, savepath)
+    Assembler.create_binary(pipeline, hsv_filter_path, save_dir)
 
     # finally, activate Kinetic project in Visual Studio
     # TODO: embed or extend python into c++ project

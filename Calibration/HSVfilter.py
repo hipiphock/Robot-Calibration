@@ -18,24 +18,24 @@ def get_max_radius(contours):
                 max_radius = radius
     return max_radius, cx, cy
 
-def save_image(image, dir_name):
+def save_image(image, save_dir):
     time_str = time.strftime('%Y%m%d-%H-%M-%S', time.localtime(time.time()))
-    cv2.imwrite("./{}/img_{}.png".format(dir_name, time_str), image)
+    cv2.imwrite("./{}/img_{}.png".format(save_dir, time_str), image)
     print("-->>sys :  img_saved ")
 
-# saves filter
-def exit_program(savepath, low_h, low_s, low_v, high_h, high_s, high_v):
+# save filter and exit program
+def save_filter_and_exit(save_dir, low_h, low_s, low_v, high_h, high_s, high_v):
     print("-->>sys :  Exit program ")
-    file_name = "hsv_{}.txt".format(savepath)
-    file_path = os.path.join(savepath + "/", file_name)
+    file_name = "hsv_{}.txt".format(save_dir)
+    file_path = os.path.join(save_dir + "/", file_name)
     f = open(file_path, "a")
-    f.write("{}".format(savepath, time.strftime('%Y%m%d-%H-%M-%S', time.localtime(time.time()))))
+    f.write("{}".format(save_dir, time.strftime('%Y%m%d-%H-%M-%S', time.localtime(time.time()))))
     f.write("\n-->>sys :  low__Result ~ H:{0:3d}, S:{1:3d}, V:{2:3d}".format(low_h, low_s, low_v))
     f.write("\n-->>sys :  high_Result ~ H:{0:3d}, S:{1:3d}, V:{2:3d}".format(high_h, high_s, high_v))
     f.close()
     cv2.destroyAllWindows()
 
-# TODO: 죄다 고쳐야함
+# TODO: should change it to appropriate form
 def read_hsv_filter(hsv_filter_path):
     f_hsv = open(hsv_filter_path, "r")
     line = []
@@ -62,7 +62,7 @@ def read_hsv_filter(hsv_filter_path):
     return low_hsv, high_hsv
 
 # get image and convert color image into numpy array
-def save_hsv_filter(pipeline, savepath):
+def save_hsv_filter(pipeline, save_dir):
     """
     generates and saves hsv filter.
     the hsv filter will be used later
@@ -85,7 +85,7 @@ def save_hsv_filter(pipeline, savepath):
     cv2.setTrackbarPos('high_s', 'bar', 255)
     cv2.setTrackbarPos('high_v', 'bar', 255)
 
-    create_directory(savepath)
+    create_directory(save_dir)
 
     put_it_on_flag = 0
 
@@ -149,7 +149,6 @@ def save_hsv_filter(pipeline, savepath):
         font = cv2.FONT_ITALIC
         try:
             cx, cy = int(cx), int(cy)
-
             if 0 < max_radius <= 3:
                 print("-->>hsv : put it closer!")
                 cv2.rectangle(result, (0, 0), 1280, 720, (0, 0, 255), 2)  # draw circle in red color
@@ -192,7 +191,7 @@ def save_hsv_filter(pipeline, savepath):
         if k == ord('s'):
             print("-->>sys :  low__Result : H : {}, S : {}, V : {}".format(low_h, low_s, low_v))
             print("-->>sys :  high_Result : H : {}, S : {}, V : {}".format(high_h, high_s, high_v))
-            save_image(img, savepath)
+            save_image(img, save_dir)
         if k == ord('h'):
             left_back = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
             rob.movej(left_back, 1, 1)
@@ -210,5 +209,5 @@ def save_hsv_filter(pipeline, savepath):
             rob.movej(left_front, 1, 1)
 
         if k & 0xFF == 27:  # ESC
-            exit_program(savepath)
+            save_filter_and_exit(save_dir, low_h, low_s, low_v, high_h, high_s, high_v)
             break

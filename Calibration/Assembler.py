@@ -6,61 +6,67 @@ import numpy as np
 from Calibration.HSVfilter import read_hsv_filter
 from Calibration.collecting_position import DataRecord
 
+
 # : 3 : 포즈를 기반으로 bin파일 생성
-# : 다음 4 : Kinect3DCalib. cpp프로젝트 실행
+# : 다음 4 : Kinect3DCalib.cpp 프로젝트 실행
 def get_cam_img(pipeline):
-	frames = pipeline.wait_for_frames()
-	color_frame = frames.get_color_frame()
+    frames = pipeline.wait_for_frames()
+    color_frame = frames.get_color_frame()
 
-	align = rs.align(rs.stream.color)
-	frameset = align.process(frames)
+    align = rs.align(rs.stream.color)
+    frameset = align.process(frames)
 
-	aligned_depth_frame = frameset.get_depth_frame()
-	# depth_frame = frames.get_depth_frame()
+    aligned_depth_frame = frameset.get_depth_frame()
+    # depth_frame = frames.get_depth_frame()
 
-	# Intrinsics & Extrinsics
-	depth_intrin = aligned_depth_frame.profile.as_video_stream_profile().intrinsics
-	# depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
-	color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
-	# color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
-	depth_to_color_extrin = aligned_depth_frame.profile.get_extrinsics_to(color_frame.profile)
-	# depth_to_color_extrin = depth_frame.profile.get_extrinsics_to(color_frame.profile)
+    # Intrinsics & Extrinsics
+    depth_intrin = aligned_depth_frame.profile.as_video_stream_profile().intrinsics
+    # depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
+    color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
+    # color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
+    depth_to_color_extrin = aligned_depth_frame.profile.get_extrinsics_to(color_frame.profile)
+    # depth_to_color_extrin = depth_frame.profile.get_extrinsics_to(color_frame.profile)
 
-	# Convert images to numpy arrays
-	# depth_image = np.asanyarray(depth_frame.get_data())
-	depth_image = np.asanyarray(aligned_depth_frame.get_data())
-	color_image = np.asanyarray(color_frame.get_data())
+    # Convert images to numpy arrays
+    # depth_image = np.asanyarray(depth_frame.get_data())
+    depth_image = np.asanyarray(aligned_depth_frame.get_data())
+    color_image = np.asanyarray(color_frame.get_data())
 
-	return aligned_depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
-	# return depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
+    return aligned_depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
+    # return depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
 
+def new_get_cam_img(pipeline):
+    frames = pipeline.wait_for_frames(1)
+    depth_frame = frames.get
 
 def init_cam(fp, low_hsv, high_hsv):
-	print("-->>sys : initializing Realsense ......")
-	for num in range(0, fp):
+    print("-->>sys : initializing Realsense ......")
+    for num in range(0, fp):
+        _, _, _, _, depth_image, color_image = get_cam_img()
+        test_view = np.copy(color_image)
 
-		_, _, _, _, depth_image, color_image = get_cam_img()
-		test_view = np.copy(color_image)
+        hsv = cv2.cvtColor(test_view, cv2.COLOR_RGB2HSV)
+        lower_blue = low_hsv
+        upper_blue = high_hsv
+        mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
-		hsv = cv2.cvtColor(test_view, cv2.COLOR_RGB2HSV)
-		lower_blue = low_hsv
-		upper_blue = high_hsv
-		mask = cv2.inRange(hsv, lower_blue, upper_blue)
-		result = cv2.bitwise_and(test_view, color_image, mask=mask)
 
-		ret, thresh = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
-		blurred0 = cv2.medianBlur(thresh, 5)
-		blurred = cv2.cvtColor(blurred0, cv2.COLOR_RGB2GRAY)
-		# th3 = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-		_, th3 = cv2.threshold(blurred, 10, 255, cv2.THRESH_BINARY)
+        result = cv2.bitwise_and(test_view, color_image, mask=mask)
 
-		cv2.moveWindow('threshold', 2560 - int(1280 / 2) - 1, 0)
-		cv2.imshow('threshold', cv2.resize(th3, (int(1280 / 2), int(720 / 2))))
-		cv2.moveWindow('color_image', 2560 - int(1280 / 2) - 1, 390)
-		cv2.imshow('color_image', cv2.resize(color_image, (int(1280 / 2), int(720 / 2))))
-		cv2.waitKey(2)
+        ret, thresh = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
+        blurred0 = cv2.medianBlur(thresh, 5)
+        blurred = cv2.cvtColor(blurred0, cv2.COLOR_RGB2GRAY)
+        # th3 = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        _, th3 = cv2.threshold(blurred, 10, 255, cv2.THRESH_BINARY)
 
-	print("-->>sys : Realsense initializing completed.")
+        cv2.moveWindow('threshold', 2560 - int(1280 / 2) - 1, 0)
+        cv2.imshow('threshold', cv2.resize(th3, (int(1280 / 2), int(720 / 2))))
+        cv2.moveWindow('color_image', 2560 - int(1280 / 2) - 1, 390)
+        cv2.imshow('color_image', cv2.resize(color_image, (int(1280 / 2), int(720 / 2))))
+        cv2.waitKey(2)
+
+    print("-->>sys : Realsense initializing completed.")
+
 
 def create_binary(pipeline, hsv_filter_path, joint_path):
     rob = urx.Robot("192.168.10.55")
@@ -73,7 +79,7 @@ def create_binary(pipeline, hsv_filter_path, joint_path):
     init_cam(120)
 
     dataRecord = DataRecord()
-    print("-->>sys : move robot to HOME pose ......")
+    print("-->>sys : move robot to HOME position ......")
     rob.movej(home_joint_rad, 2, 2)
 
     # open binary datafile
@@ -121,17 +127,14 @@ def create_binary(pipeline, hsv_filter_path, joint_path):
             h = index[:, 0]
             w = index[:, 1]
             ###########
-            c_x = int(np.mean(w))
-            c_y = int(np.mean(h))
+            c_x, c_y = int(np.mean(w)), int(np.mean(h))
 
             depth0 = depth_frame.get_distance(c_x, c_y)
             depth0_ = depth_image[c_y, c_x]
 
-            depth_point0 = rs.rs2_deproject_pixel_to_point(depth_intrin, [c_x, c_y], depth0)
+            depth_point_0 = rs.rs2_deproject_pixel_to_point(depth_intrin, [c_x, c_y], depth0)
 
-            camera_x = []
-            camera_y = []
-            camera_z = []
+            camera_x, camera_y, camera_z = [], [], []
             for i in range(c_y - 3, c_y + 3 + 1):
                 for j in range(c_x - 3, c_x + 3 + 1):
                     depth_1 = depth_frame.get_distance(j, i)
@@ -148,9 +151,7 @@ def create_binary(pipeline, hsv_filter_path, joint_path):
             sorted_y.sort()
             sorted_y_array = np.array(sorted_y)
 
-            camera_x2 = []
-            camera_y2 = []
-            camera_z2 = []
+            camera_x2, camera_y2, camera_z2 = [], [], []
             for k in range(c_y - 3, c_y + 3 + 1):
                 for l in range(c_x - 3, c_x + 3 + 1):
                     depth_2 = depth_frame.get_distance(l, k)

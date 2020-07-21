@@ -18,7 +18,7 @@ def collect_joint(pipeline, hsv_filter_path, savepath):
 	low_hsv, high_hsv = read_hsv_filter(hsv_filter_path)
 	# robot
 	# rob = urx.Robot("192.168.10.72")              # 오른쪽
-	# rob = urx.Robot("192.168.10.77")                # 왼쪽
+	# rob = urx.Robot("192.168.10.77")              # 왼쪽
 	rob = urx.Robot("192.168.10.55")  # 왼쪽
 	rob.set_tcp([0, 0, 0.153, 0, 0, 0])
 	home_joint_rad = np.deg2rad([55.62, -41.46, 75.42, -123.94, -89.92, 55.89])
@@ -73,7 +73,6 @@ def collect_joint(pipeline, hsv_filter_path, savepath):
 		font = cv2.FONT_ITALIC
 		try:
 			cx, cy = int(cx), int(cy)
-
 			if 0 < max_radius <= 3:
 				print("-->>hsv : put it closer!")
 				cv2.rectangle(result, (0, 0), 1280, 720, (0, 0, 255), 2)  # draw circle in red color
@@ -96,7 +95,6 @@ def collect_joint(pipeline, hsv_filter_path, savepath):
 		if key == ord('f'):  # : 프리드라이브
 			rob.set_freedrive(not is_free, 3600)  # 3600 sec.
 			is_free = not is_free
-
 			if is_free:
 				print(" Free Drive Mode : ON !!")
 			else:
