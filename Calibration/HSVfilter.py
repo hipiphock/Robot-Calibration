@@ -93,20 +93,7 @@ def save_hsv_filter(pipeline, save_dir):
     # : RL robot
     set_robot("192.168.0.51", "192.168.0.52")
 
-    while True:  # : 프로그램이 돌아가는 영역 - 반복
-        # frames = pipeline.wait_for_frames()
-        # depth_frame = frames.get_depth_frame()
-        # color_frame = frames.get_color_frame()
-
-        # # Intrinsics & Extrinsics
-        # depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
-        # color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
-        # depth_to_color_extrin = depth_frame.profile.get_extrinsics_to(color_frame.profile)
-
-        # # Convert images to numpy arrays
-        # depth_image = np.asanyarray(depth_frame.get_data())
-        # color_image = np.asanyarray(color_frame.get_data())
-        
+    while True:  # : 프로그램이 돌아가는 영역 - 반복      
         _, _, _, color_image = CameraStream.get_frames_and_images(pipeline)
 
         img = color_image

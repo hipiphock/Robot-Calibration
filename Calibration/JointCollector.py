@@ -31,19 +31,6 @@ def collect_joint(pipeline, hsv_filter_path, savepath):
 	line_cnt = 0
 	while True:
 		is_free = False
-
-		# frames = pipeline.wait_for_frames()
-		# depth_frame = frames.get_depth_frame()
-		# color_frame = frames.get_color_frame()
-
-		# # Intrinsics & Extrinsics
-		# depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
-		# color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
-		# depth_to_color_extrin = depth_frame.profile.get_extrinsics_to(color_frame.profile)
-
-		# # Convert images to numpy arrays
-		# depth_image = np.asanyarray(depth_frame.get_data())
-		# color_image = np.asanyarray(color_frame.get_data())
 		
 		_, _, _, color_image = CameraStream.get_frames_and_images(pipeline)
 
