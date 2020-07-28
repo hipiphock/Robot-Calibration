@@ -38,6 +38,7 @@ def config_pipeline():
 	pipe_profile = pipeline.start(config)
 	return pipeline
 
+# setting robot
 def set_robot(left_robot_addr, right_robot_addr):
 	left_robot = urx.Robot(left_robot_addr)
 	right_robot = urx.Robot(right_robot_addr)
@@ -46,3 +47,17 @@ def set_robot(left_robot_addr, right_robot_addr):
 	left_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
 	right_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
 	rob.movej(home_joint_rad, 0.5, 0.5)
+
+def get_frames_and_images(pipeline):
+	frames = pipeline.wait_for_frames()
+	depth_frame = frames.get_depth_frame()
+	color_frame = frames.get_color_frame()
+
+	depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
+	color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
+	depth_to_color_extrin = depth_frame.profile.get_extrinsics_to(color_frame.profile)
+
+	depth_image = np.asanyarray(depth_frame.get_data())
+	color_image = np.asanyarray(color_frame.get_data())
+
+	return depth_frame, color_frame, depth_image, color_image
