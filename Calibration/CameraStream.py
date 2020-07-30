@@ -48,6 +48,7 @@ def set_robot(left_robot_addr, right_robot_addr):
 	right_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
 	rob.movej(home_joint_rad, 0.5, 0.5)
 
+# returns depth/color frames and images
 def get_frames_and_images(pipeline):
 	frames = pipeline.wait_for_frames()
 	depth_frame = frames.get_depth_frame()

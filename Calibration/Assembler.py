@@ -6,10 +6,17 @@ import numpy as np
 from Calibration.HSVfilter import read_hsv_filter
 from Calibration.collecting_position import DataRecord
 
+pipeline = rs.pipeline()
+config = rs.config()
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+
+# Start streaming
+pipe_profile = pipeline.start(config)
 
 # : 3 : 포즈를 기반으로 bin파일 생성
 # : 다음 4 : Kinect3DCalib.cpp 프로젝트 실행
-def get_cam_img(pipeline):
+def get_cam_img():
     frames = pipeline.wait_for_frames()
     color_frame = frames.get_color_frame()
 
@@ -35,14 +42,10 @@ def get_cam_img(pipeline):
     return aligned_depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
     # return depth_frame, color_frame, depth_intrin, color_intrin, depth_image, color_image
 
-def new_get_cam_img(pipeline):
-    frames = pipeline.wait_for_frames(1)
-    depth_frame = frames.get
-
 def init_cam(fp, low_hsv, high_hsv):
     print("-->>sys : initializing Realsense ......")
     for num in range(0, fp):
-        _, _, _, _, depth_image, color_image = get_cam_img()
+        _, _, _, _, _, color_image = get_cam_img()
         test_view = np.copy(color_image)
 
         hsv = cv2.cvtColor(test_view, cv2.COLOR_RGB2HSV)

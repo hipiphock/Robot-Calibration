@@ -27,11 +27,11 @@ def collect_joint(pipeline, hsv_filter_path, savepath):
 
 	# main function part
 	joint_file = savepath + "joint.txt"
-	file = open(joint_file, "")
+	file = open(joint_file, "r")
 	line_cnt = 0
 	while True:
 		is_free = False
-		
+
 		_, _, _, color_image = CameraStream.get_frames_and_images(pipeline)
 
 		img = color_image
