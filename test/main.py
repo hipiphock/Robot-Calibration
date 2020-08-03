@@ -10,6 +10,8 @@ import Calibration.Assembler as Assembler
 
 if __name__ == "__main__":
 
+    cam_robot_addr = "192.168.0.22"
+
     # basic configuration used for all routines
     pipeline = CameraStream.config_pipeline()
 

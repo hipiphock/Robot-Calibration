@@ -6,7 +6,6 @@ import cv2
 import urx
 import numpy as np
 from Calibration.Helper import nothing, create_directory
-# from Calibration.CameraStream import set_robot
 import Calibration.CameraStream as CameraStream
 
 def get_max_radius(contours):
@@ -91,7 +90,7 @@ def save_hsv_filter(pipeline, save_dir):
     put_it_on_flag = 0
 
     # : RL robot
-    set_robot("192.168.0.51", "192.168.0.52")
+    CameraStream.set_robot("192.168.0.51", "192.168.0.52")
 
     while True:  # : 프로그램이 돌아가는 영역 - 반복      
         _, _, _, color_image = CameraStream.get_frames_and_images(pipeline)
