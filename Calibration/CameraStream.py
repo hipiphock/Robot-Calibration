@@ -4,11 +4,10 @@ import cv2
 import numpy as np
 
 # camera initialization
-def init_cam(fp):
+def init_cam(fp, pipeline):
 	print("-->>sys : initializing Realsense ......")
 	for num in range(0, fp):
-
-		_, _, _, _, depth_image, color_image = get_cam_img_main()
+		_, _, _, _, _, color_image = get_frames_and_images(pipeline)
 		test_view = np.copy(color_image)
 
 		hsv = cv2.cvtColor(test_view, cv2.COLOR_RGB2HSV)
@@ -39,14 +38,15 @@ def config_pipeline():
 	return pipeline
 
 # setting robot
-def set_robot(left_robot_addr, right_robot_addr):
-	left_robot = urx.Robot(left_robot_addr)
-	right_robot = urx.Robot(right_robot_addr)
-	left_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-	right_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-	left_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
-	right_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
-	rob.movej(home_joint_rad, 0.5, 0.5)
+def set_robot(cam_robot_addr, nocam_robot_addr):
+	cam_robot = urx.Robot(cam_robot_addr)
+	nocam_robot = urx.Robot(nocam_robot_addr)
+	cam_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
+	nocam_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
+	cam_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
+	nocam_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
+	# rob.movej(home_joint_rad, 0.5, 0.5)
+	cam_robot.movej(cam_robot_home_joint_rad, 0.5, 0.5)
 
 # returns depth/color frames and images
 def get_frames_and_images(pipeline):

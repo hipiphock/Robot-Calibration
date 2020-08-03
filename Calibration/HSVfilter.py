@@ -62,7 +62,7 @@ def read_hsv_filter(hsv_filter_path):
     return low_hsv, high_hsv
 
 # get image and convert color image into numpy array
-def save_hsv_filter(pipeline, save_dir):
+def save_hsv_filter(pipeline, cam_robot, nocam_robot, save_dir):
     """
     generates and saves hsv filter.
     the hsv filter will be used later
@@ -90,7 +90,7 @@ def save_hsv_filter(pipeline, save_dir):
     put_it_on_flag = 0
 
     # : RL robot
-    CameraStream.set_robot("192.168.0.51", "192.168.0.52")
+    CameraStream.set_robot(cam_robot, nocam_robot)
 
     while True:  # : 프로그램이 돌아가는 영역 - 반복      
         _, _, _, color_image = CameraStream.get_frames_and_images(pipeline)

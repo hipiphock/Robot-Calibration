@@ -15,12 +15,12 @@ import Calibration.CameraStream as CameraStream
 def save_joint_data():
 	pass
 
-def collect_joint(pipeline, hsv_filter_path, savepath):
+def collect_joint(pipeline, cam_robot, hsv_filter_path, savepath):
 	low_hsv, high_hsv = read_hsv_filter(hsv_filter_path)
 	# robot
 	# rob = urx.Robot("192.168.10.72")              # 오른쪽
 	# rob = urx.Robot("192.168.10.77")              # 왼쪽
-	rob = urx.Robot("192.168.10.55")  # 왼쪽
+	rob = urx.Robot(cam_robot)  # 왼쪽
 	rob.set_tcp([0, 0, 0.153, 0, 0, 0])
 	home_joint_rad = np.deg2rad([55.62, -41.46, 75.42, -123.94, -89.92, 55.89])
 	rob.movej(home_joint_rad, 0.5, 0.5)

@@ -71,8 +71,8 @@ def init_cam(fp, low_hsv, high_hsv):
     print("-->>sys : Realsense initializing completed.")
 
 
-def create_binary(pipeline, hsv_filter_path, joint_path):
-    rob = urx.Robot("192.168.10.55")
+def create_binary(pipeline, cam_robot, hsv_filter_path, joint_path):
+    rob = urx.Robot(cam_robot)
     home_joint_rad = np.deg2rad([55.62, -41.46, 75.42, -123.94, -89.92, 55.89])
     rob.movej(home_joint_rad, 0.5, 0.5)
 
