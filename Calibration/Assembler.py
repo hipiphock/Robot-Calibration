@@ -1,5 +1,6 @@
 import pyrealsense2 as rs
 
+import os
 import cv2
 import urx
 import numpy as np
@@ -52,8 +53,6 @@ def init_cam(fp, low_hsv, high_hsv):
         lower_blue = low_hsv
         upper_blue = high_hsv
         mask = cv2.inRange(hsv, lower_blue, upper_blue)
-
-
         result = cv2.bitwise_and(test_view, color_image, mask=mask)
 
         ret, thresh = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
@@ -71,22 +70,28 @@ def init_cam(fp, low_hsv, high_hsv):
     print("-->>sys : Realsense initializing completed.")
 
 
-def create_binary(pipeline, cam_robot, hsv_filter_path, joint_path):
-    rob = urx.Robot(cam_robot)
-    home_joint_rad = np.deg2rad([55.62, -41.46, 75.42, -123.94, -89.92, 55.89])
-    rob.movej(home_joint_rad, 0.5, 0.5)
+def create_binary(pipeline, cam_robot, nocam_robot, hsv_filter_path, joint_path, savedir):
+    cam_home_joint_rad = np.deg2rad([0.3209, -113.0970, -4.5383, -152.3580, 89.6613, 1.2152])  # : Cam Pose
+    nocam_home_joint_rad_b = np.deg2rad([40.9664, -74.1802, 117.9032, -112.9013, 247.8042, -224.6624 + 180])  # : Tray Pose - big
+    nocam_home_joint_rad_s = [0.7150, -1.29469, 2.0578, -1.9705, 4.3250, -3.9211]  # : Tray Pose(rad) - small
+
+    cam_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
+    nocam_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
+
+    cam_robot.movej(cam_home_joint_rad, 0.5, 0.5)
+    nocam_robot.movej(nocam_home_joint_rad_s, 0.5, 0.5)
 
     low_hsv, high_hsv = read_hsv_filter(hsv_filter_path)
 
     print("-->>sys : Starting Calibration datacollect ......")
-    init_cam(120)
+    init_cam(120, low_hsv, high_hsv)
 
     dataRecord = DataRecord()
     print("-->>sys : move robot to HOME position ......")
-    rob.movej(home_joint_rad, 2, 2)
+    nocam_robot.movej(nocam_home_joint_rad_s, 1, 1)
 
     # open binary datafile
-    binary_path = ""
+    binary_path = os.path.join(savedir, "joint_list.bin")
     binary_file = open(binary_path, "r")
     init = 0
     for _ in range(init):
@@ -96,7 +101,7 @@ def create_binary(pipeline, cam_robot, hsv_filter_path, joint_path):
         try:
             k = line.split(' ')
             j_pt = [float(j) for j in k]
-            rob.movej(j_pt, 0.8, 0.8)
+            nocam_robot.movej(j_pt, 0.8, 0.8)
 
             cv2.waitKey(100)
 
@@ -120,9 +125,9 @@ def create_binary(pipeline, cam_robot, hsv_filter_path, joint_path):
             _, contours, hierarchy = cv2.findContours(th3, 1, 2)  # :
             cv2.drawContours(color_image, contours, -1, (0, 255, 0), 2)
 
-            cv2.moveWindow('threshold', 2560 - int(1280 / 2) - 1, 0)
+            cv2.moveWindow('threshold', 1920 - int(1280 / 2) - 1, 0)
             cv2.imshow('threshold', cv2.resize(th3, (int(1280 / 2), int(720 / 2))))
-            cv2.moveWindow('color_image', 2560 - int(1280 / 2) - 1, 390)
+            cv2.moveWindow('color_image', 1920 - int(1280 / 2) - 1, 390)
             cv2.imshow('color_image', cv2.resize(color_image, (int(1280 / 2), int(720 / 2))))
             cv2.waitKey(2)
 
@@ -187,10 +192,10 @@ def create_binary(pipeline, cam_robot, hsv_filter_path, joint_path):
         except:
             print('frame passed {}'.format(idx))
             continue
-    rob.movej(home_joint_rad, 2, 2)
+    nocam_robot.movej(nocam_home_joint_rad_s, 2, 2)
     DataRecord.CloseData()
 
     # 정상적으로 저장 완료 된 상태.
     print('finish')
-    rob.set_tcp([0, 0, 0, 0, 0, 0])
-    rob.close()
+    nocam_robot.set_tcp([0, 0, 0, 0, 0, 0])
+    nocam_robot.close()

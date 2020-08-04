@@ -15,19 +15,22 @@ import Calibration.CameraStream as CameraStream
 def save_joint_data():
 	pass
 
-def collect_joint(pipeline, cam_robot, hsv_filter_path, savepath):
+def collect_joint(pipeline, cam_robot, nocam_robot, hsv_filter_path, savedir):
 	low_hsv, high_hsv = read_hsv_filter(hsv_filter_path)
-	# robot
-	# rob = urx.Robot("192.168.10.72")              # 오른쪽
-	# rob = urx.Robot("192.168.10.77")              # 왼쪽
-	rob = urx.Robot(cam_robot)  # 왼쪽
-	rob.set_tcp([0, 0, 0.153, 0, 0, 0])
-	home_joint_rad = np.deg2rad([55.62, -41.46, 75.42, -123.94, -89.92, 55.89])
-	rob.movej(home_joint_rad, 0.5, 0.5)
+
+	cam_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
+	nocam_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
+
+	# move camear robot
+	cam_home_joint_rad = np.deg2rad([0.3209, -113.0970, -4.5383, -152.3580, 89.6613, 1.2152])  # : Cam Pose
+	cam_robot.movej(cam_home_joint_rad, 0.5, 0.5)
+	# move gripper robot
+	center = np.deg2rad([-35.45, -62.40, 117.18, -0.87, 67.47, -207.88])
+	nocam_robot.movej(center, 0.5, 0.5)
 
 	# main function part
-	joint_file = savepath + "joint.txt"
-	file = open(joint_file, "r")
+	joint_file = os.path.join(savedir, "joint.txt")
+	file = open(joint_file, "a")
 	line_cnt = 0
 	while True:
 		is_free = False
@@ -75,12 +78,60 @@ def collect_joint(pipeline, cam_robot, hsv_filter_path, savepath):
 		except:
 			print("-->>hsv : Can't Find the ball")
 
-		cv2.moveWindow('Color filter', 2560 - int(1280 / 2) - 1, 320)
+		cv2.moveWindow('Color filter', 1920 - int(1280 / 2) - 1, 320)
 		cv2.imshow('Color filter', cv2.resize(result, (int(1280 / 2), int(720 / 2))))
-		cv2.moveWindow('origin', 2560 - int(1280 / 2) - 1, 680)
+		cv2.moveWindow('origin', 1920 - int(1280 / 2) - 1, 680)
 		cv2.imshow('origin', cv2.resize(img, (int(1280 / 2), int(720 / 2))))
 
 		key = cv2.waitKey(33)
+
+		# if key == ord('m'):  # : 로봇 스텝별로 움직이기
+		# 	print(" robot moving on ... ")
+		# 	# k = line.split(' ')
+		# 	# j_pt = [float(j) for j in k]
+		# 	# rob.movej(j_pt, 0.8, 0.8)
+		#
+		# 	cv2.waitKey(100)
+
+		robot_location = rob2.getl()
+		rob_x =robot_location[0]
+		rob_y =robot_location[1]
+		rob_z =robot_location[2]
+
+		if key == ord('a'):  # : 프리드라이브
+			rob_x += 0.01
+			robot_location[0] = rob_x
+			rob2.movel(robot_location, 0.5, 0.5)
+
+		if key == ord('d'):  # : 프리드라이브
+			rob_x -= 0.01
+			robot_location[0] = rob_x
+			rob2.movel(robot_location, 0.5, 0.5)
+
+		# ---- ---- ---- ----
+		if key == ord('s'):  # : 프리드라이브
+			rob_y += 0.01
+			robot_location[1] = rob_y
+			rob2.movel(robot_location, 0.5, 0.5)
+
+		if key == ord('w'):  # : 프리드라이브
+			rob_y -= 0.01
+			robot_location[1] = rob_y
+			rob2.movel(robot_location, 0.5, 0.5)
+
+		# ---- ---- ---- ----
+		if key == ord('q'):  # : 프리드라이브
+			rob_z += 0.01
+			robot_location[2] = rob_z
+			rob2.movel(robot_location, 0.5, 0.5)
+
+		if key == ord('e'):  # : 프리드라이브
+			rob_z -= 0.01
+			robot_location[2] = rob_z
+			rob2.movel(robot_location, 0.5, 0.5)
+
+		if key == ord('h'):  # : 프리드라이브
+			rob2.movej(home_joint_rad, 0.5, 0.5)
 
 		if key == ord('f'):  # : 프리드라이브
 			rob.set_freedrive(not is_free, 3600)  # 3600 sec.
@@ -93,7 +144,7 @@ def collect_joint(pipeline, cam_robot, hsv_filter_path, savepath):
 		if key == 115:  # : S   # : 저장
 			if 6 < max_radius:
 				curj = np.round(rob.getj(), 4)
-				f.write("{} {} {} {} {} {}\n".format(*curj))
+				file.write("{} {} {} {} {} {}\n".format(*curj))
 				print("Saved joint data . {}".format(line_cnt))
 				line_cnt += 1
 			else:

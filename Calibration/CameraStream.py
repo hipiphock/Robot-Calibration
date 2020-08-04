@@ -28,6 +28,7 @@ def init_cam(fp, pipeline):
 		cv2.imshow('color_image', cv2.resize(color_image, (int(1280 / 2), int(720 / 2))))
 		cv2.waitKey(2)
 
+# import 한 kinect_snap의 global_cam 클래스를 불러온 오브젝트
 # pipeline configuration for streaming
 def config_pipeline():
 	pipeline = rs.pipeline()
@@ -36,17 +37,6 @@ def config_pipeline():
 	config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)    # problem with resolution: camera not supporting 1280*720
 	pipe_profile = pipeline.start(config)
 	return pipeline
-
-# setting robot
-def set_robot(cam_robot_addr, nocam_robot_addr):
-	cam_robot = urx.Robot(cam_robot_addr)
-	nocam_robot = urx.Robot(nocam_robot_addr)
-	cam_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-	nocam_robot_home_joint_rad = np.deg2rad([67.83, -71.38, 130.59, -149.20, -90.08, 66.66])
-	cam_robot.set_tcp([0, 0, 0.170, 0, 0, 0])
-	nocam_robot.set_tcp([0, 0, 0.153, 0, 0, 0])
-	# rob.movej(home_joint_rad, 0.5, 0.5)
-	cam_robot.movej(cam_robot_home_joint_rad, 0.5, 0.5)
 
 # returns depth/color frames and images
 def get_frames_and_images(pipeline):
