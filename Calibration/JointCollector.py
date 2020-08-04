@@ -93,7 +93,7 @@ def collect_joint(pipeline, cam_robot, nocam_robot, hsv_filter_path, savedir):
 		#
 		# 	cv2.waitKey(100)
 
-		robot_location = rob2.getl()
+		robot_location = nocam_robot.getl()
 		rob_x =robot_location[0]
 		rob_y =robot_location[1]
 		rob_z =robot_location[2]
@@ -101,37 +101,37 @@ def collect_joint(pipeline, cam_robot, nocam_robot, hsv_filter_path, savedir):
 		if key == ord('a'):  # : 프리드라이브
 			rob_x += 0.01
 			robot_location[0] = rob_x
-			rob2.movel(robot_location, 0.5, 0.5)
+			nocam_robot.movel(robot_location, 0.5, 0.5)
 
 		if key == ord('d'):  # : 프리드라이브
 			rob_x -= 0.01
 			robot_location[0] = rob_x
-			rob2.movel(robot_location, 0.5, 0.5)
+			nocam_robot.movel(robot_location, 0.5, 0.5)
 
 		# ---- ---- ---- ----
 		if key == ord('s'):  # : 프리드라이브
 			rob_y += 0.01
 			robot_location[1] = rob_y
-			rob2.movel(robot_location, 0.5, 0.5)
+			nocam_robot.movel(robot_location, 0.5, 0.5)
 
 		if key == ord('w'):  # : 프리드라이브
 			rob_y -= 0.01
 			robot_location[1] = rob_y
-			rob2.movel(robot_location, 0.5, 0.5)
+			nocam_robot.movel(robot_location, 0.5, 0.5)
 
 		# ---- ---- ---- ----
 		if key == ord('q'):  # : 프리드라이브
 			rob_z += 0.01
 			robot_location[2] = rob_z
-			rob2.movel(robot_location, 0.5, 0.5)
+			nocam_robot.movel(robot_location, 0.5, 0.5)
 
 		if key == ord('e'):  # : 프리드라이브
 			rob_z -= 0.01
 			robot_location[2] = rob_z
-			rob2.movel(robot_location, 0.5, 0.5)
+			nocam_robot.movel(robot_location, 0.5, 0.5)
 
 		if key == ord('h'):  # : 프리드라이브
-			rob2.movej(home_joint_rad, 0.5, 0.5)
+			nocam_robot.movej(home_joint_rad, 0.5, 0.5)
 
 		if key == ord('f'):  # : 프리드라이브
 			rob.set_freedrive(not is_free, 3600)  # 3600 sec.
