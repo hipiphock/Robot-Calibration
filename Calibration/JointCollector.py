@@ -130,11 +130,11 @@ def collect_joint(pipeline, cam_robot, nocam_robot, hsv_filter_path, savedir):
 			robot_location[2] = rob_z
 			nocam_robot.movel(robot_location, 0.5, 0.5)
 
-		if key == ord('h'):  # : 프리드라이브
-			nocam_robot.movej(home_joint_rad, 0.5, 0.5)
+		# if key == ord('h'):  # : 프리드라이브
+		# 	nocam_robot.movej(home_joint_rad, 0.5, 0.5)
 
 		if key == ord('f'):  # : 프리드라이브
-			rob.set_freedrive(not is_free, 3600)  # 3600 sec.
+			nocam_robot.set_freedrive(not is_free, 3600)  # 3600 sec.
 			is_free = not is_free
 			if is_free:
 				print(" Free Drive Mode : ON !!")
@@ -143,7 +143,7 @@ def collect_joint(pipeline, cam_robot, nocam_robot, hsv_filter_path, savedir):
 
 		if key == 115:  # : S   # : 저장
 			if 6 < max_radius:
-				curj = np.round(rob.getj(), 4)
+				curj = np.round(nocam_robot.getj(), 4)
 				file.write("{} {} {} {} {} {}\n".format(*curj))
 				print("Saved joint data . {}".format(line_cnt))
 				line_cnt += 1

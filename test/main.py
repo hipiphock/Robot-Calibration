@@ -29,12 +29,12 @@ if __name__ == "__main__":
     hsv_filter_path = "./resource/example/hsv_result.txt"
 
     # collect joint
-    JointCollector.collect_joint(pipeline, cam_robot, nocam_robot, hsv_filter_path, save_dir)
+    # JointCollector.collect_joint(pipeline, cam_robot, nocam_robot, hsv_filter_path, save_dir)
 
     joint_path = "./resource/example/"
 
     # assemble collected joint and hsv filter
-    Assembler.create_binary(pipeline, cam_robot, nocam_robot, hsv_filter_path, save_dir)
+    Assembler.create_binary(pipeline, cam_robot, nocam_robot, hsv_filter_path, joint_path, save_dir)
 
     # finally, activate Kinetic project in Visual Studio
     # TODO: embed or extend python into c++ project
