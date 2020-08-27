@@ -12,3 +12,16 @@
  * Collecting Joint of Robot
  * Assembling filter and joint
  * Executing RANSAC Algorithm
+다만, 기존에 Joint를 이미 구해놨다면, 특별히 joint를 구할 필요는 없다.
+
+ ## Generating HSV filter
+ 이 과정에서는 camera로 detect하는 object의 filter를 구한다.
+ Camera의 HSV 값을 조절하며 화면에서 object만을 detect 하는 값을 저장하면 된다.
+
+ ## Collecting Joint of Robot
+ 이 과정에서는 robot의 joint를 구한다. 직접 robot을 움직여가며 joint를 구한다.
+
+ ## Assembling filter and joint
+ 기존에 구한 filter 값과 joint 값들을 합쳐서 calibration을 하는데 필요한 binary file을 만든다.
+
+ 이 모든 과정이 끝난다면, 
