@@ -12,7 +12,8 @@
  * Collecting Joint of Robot
  * Assembling filter and joint
  * Executing RANSAC Algorithm
-다만, 기존에 Joint를 이미 구해놨다면, 특별히 joint를 구할 필요는 없다.
+ 
+다만, 기존에 Joint를 이미 구해놨다면, Collecting Joint of Robot 과정에서 특별히 joint를 구할 필요는 없다.
 
  ## Generating HSV filter
  이 과정에서는 camera로 detect하는 object의 filter를 구한다.
